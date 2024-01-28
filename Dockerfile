@@ -2,15 +2,18 @@ FROM ubuntu:20.04
 
 ENV DEBIAN_FRONTEND=noninteractive
 
-# Create a new user with root permissions
-RUN useradd -m -s /bin/bash -G sudo newuser && echo 'hero:hero' | chpasswd
+# Install GUI and RDP protocol
+RUN apt-get update && \
+    apt-get install -y xfce4 xrdp && \
+    apt-get clean
 
-# Install GUI
-RUN apt-get update && apt-get install -y xfce4 xrdp
+# Create a new user with password 'hero' and add it to the sudo group
+RUN useradd -m -s /bin/bash newuser && \
+    echo 'newuser:hero' | chpasswd && \
+    adduser newuser sudo
 
-# Install RDP protocol
-RUN apt-get install -y xrdp
-
+# Expose RDP port
 EXPOSE 3389
 
+# Start xrdp
 CMD ["xrdp", "-n"]
